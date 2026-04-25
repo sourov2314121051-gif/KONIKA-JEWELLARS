@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Konika Jewellers</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+html,body{height:100%;width:100%}
+body{background:#f1f5f9;padding:15px;overflow-y:auto}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.animate{animation:slideUp .5s ease-out forwards}
+.title{font-size:26px;font-weight:800;text-align:center;margin-bottom:15px;color:#1a1a1a}
+.title span{color:#00c853}
+.card{padding:22px;border-radius:20px;color:#fff;margin-bottom:15px;box-shadow:0 10px 25px rgba(0,0,0,.1);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.center-card{text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.c1{background:linear-gradient(135deg,#00c853,#64dd17)!important}
+.c2{background:linear-gradient(135deg,#2979ff,#00e5ff)!important}
+.c3{background:linear-gradient(135deg,#ff9800,#ff1744)!important}
+.c4{background:linear-gradient(135deg,#9c27b0,#673ab7)!important}
+.card h4{font-size:12px;opacity:.9;font-weight:600;letter-spacing:1px}
+.card h2{font-size:18px;margin-top:5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.box{background:#fff;padding:15px;border-radius:15px;margin-top:10px;box-shadow:0 5px 15px rgba(0,0,0,.05)}
+input,select{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #ddd;outline:0;font-size:14px}
+input:focus,select:focus{border-color:#00c853;box-shadow:0 0 5px rgba(0,200,83,.3)}
+button{width:100%;padding:12px;border:0;border-radius:10px;background:#00c853;color:#fff;font-weight:bold;margin-top:8px;cursor:pointer;transition:.3s;font-size:14px}
+button:hover{opacity:.9;transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,.2)}
+button:active{transform:translateY(0)}
+.page{display:none}
+.active{display:block}
+.records-container{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:15px;align-items:start}
+.list{background:#fff;padding:15px;border-radius:15px;box-shadow:0 8px 20px rgba(0,0,0,.08);overflow:hidden;display:flex;flex-direction:column;border:none;min-height:250px}
+.list-header{text-align:center;border-bottom:2px solid;padding-bottom:5px;margin-bottom:10px}
+.list-title{font-size:13px;font-weight:700;letter-spacing:.5px}
+.divider{display:none}
+.item{padding:8px 4px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;font-size:11px;gap:6px}
+.item-left{display:flex;align-items:center;gap:6px;flex:1;min-width:0;overflow:hidden}
+.item-num{font-weight:bold;color:#999;min-width:18px;flex-shrink:0;font-size:10px}
+.note{font-weight:700;color:#222;flex:1;min-width:0;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.amt{font-weight:900;white-space:nowrap;flex-shrink:0;font-size:12px}
+.total-sum-box{margin-top:auto;padding:10px 5px;border-top:2px solid #eee;text-align:center;font-weight:800;font-size:13px;display:flex;justify-content:center;align-items:center;gap:5px;white-space:nowrap}
+.action-footer-btns{display:flex;gap:5px;justify-content:center;padding-top:8px}
+.footer-edit-btn,.footer-delete-btn{background:#2979ff;border:0;color:#fff;padding:5px 12px;border-radius:5px;cursor:pointer;font-size:10px;font-weight:bold;transition:.2s;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.footer-delete-btn{background:#ff1744}
+.footer-edit-btn:hover{background:#1565c0}
+.footer-delete-btn:hover{background:#d50000}
+.final-report{background:#fff;border-radius:15px;padding:15px;margin-top:15px;box-shadow:0 5px 15px rgba(0,0,0,.05);-webkit-print-color-adjust:exact}
+.report-row{display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px;gap:10px;align-items:center;white-space:nowrap}
+.in-clr{color:#00c853!important}
+.out-clr{color:#ff1744!important}
+.bal-clr{color:#2979ff!important}
+#printableArea{background:#f1f5f9;padding:10px;border-radius:10px}
+.no-print{display:flex}
+.header-buttons{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:0 10px;gap:10px}
+.header-buttons input{flex:1;margin:0;padding:5px}
+.header-buttons button{margin:0;padding:8px 15px;width:auto}
+@media print{
+  .no-print{display:none!important}
+  .action-footer-btns{display:none!important}
+  .footer-edit-btn,.footer-delete-btn{display:none!important}
+  body{background:#fff;padding:0}
+  .card{margin-bottom:10px;padding:15px}
+}
+@media (max-width:600px){
+  .item{font-size:10px}
+  .list{padding:10px;min-height:200px}
+  .list-title{font-size:11px}
+  .item-num{font-size:9px;min-width:14px}
+  .amt{font-size:11px}
+  .records-container{gap:8px}
+}
+</style>
+</head>
+<body>
+
+<div id="dash" class="page active">
+<div class="title">KONIKA JEWELLERS</div>
+<div class="card c1 animate center-card">
+<h4 id="dashDay">LOADING...</h4>
+<h2 id="dashDate"></h2>
+</div>
+<div class="card c2 animate">
+<h4>TOTAL CASH IN</h4>
+<h2 id="inT">0 Tk</h2>
+</div>
+<div class="card c3 animate">
+<h4>TOTAL CASH OUT</h4>
+<h2 id="outT">0 Tk</h2>
+</div>
+<div class="card c4 animate">
+<h4>NET BALANCE</h4>
+<h2 id="bal">0 Tk</h2>
+</div>
+<div class="box animate">
+<select id="type">
+<option value="in">Cash In</option>
+<option value="out">Cash Out</option>
+</select>
+<input type="text" id="note" placeholder="Purpose / Details" maxlength="100">
+<input type="text" id="amountDisplay" placeholder="Amount" oninput="handleInput(this)" inputmode="numeric">
+<button onclick="save()">SAVE TRANSACTION</button>
+<button style="background:#2979ff" onclick="openRecords()">VIEW RECORDS</button>
+</div>
+</div>
+
+<div id="rec" class="page">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;gap:10px;padding:0 10px">
+<button style="background:#999;padding:10px 20px;width:auto;margin:0" onclick="back()">← BACK</button>
+<input type="date" id="dateFilter" onchange="renderByDate()" style="padding:8px;border:1px solid #ddd;border-radius:8px;width:auto;flex:1;margin:0">
+<button style="background:#2979ff;padding:10px 20px;width:auto;margin:0" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
+</div>
+<div id="printableArea">
+<h3 style="text-align:center;margin-bottom:10px;font-weight:800;color:#334155">CASH RECORDS</h3>
+<div id="recDateCard" class="card c1 center-card" style="padding:15px;margin-bottom:15px">
+<h4 id="recDay">MONDAY</h4>
+<h2 id="recDate">20 April 2026</h2>
+</div>
+<div class="records-container">
+<div class="list">
+<div class="list-header" style="border-color:#00c853">
+<h4 class="list-title" style="color:#00c853">CASH IN</h4>
+</div>
+<div id="inList"></div>
+<div class="total-sum-box in-clr">
+<span>Total:</span>
+<span id="sumIn">0</span>
+</div>
+<div class="action-footer-btns no-print">
+<button class="footer-edit-btn" onclick="selectToEdit('in')"><i class="fas fa-edit"></i> Edit</button>
+<button class="footer-delete-btn" onclick="selectToDelete('in')"><i class="fas fa-trash"></i> Delete</button>
+</div>
+</div>
+<div class="divider"></div>
+<div class="list">
+<div class="list-header" style="border-color:#ff1744">
+<h4 class="list-title" style="color:#ff1744">CASH OUT</h4>
+</div>
+<div id="outList"></div>
+<div class="total-sum-box out-clr">
+<span>Total:</span>
+<span id="sumOut">0</span>
+</div>
+<div class="action-footer-btns no-print">
+<button class="footer-edit-btn" onclick="selectToEdit('out')"><i class="fas fa-edit"></i> Edit</button>
+<button class="footer-delete-btn" onclick="selectToDelete('out')"><i class="fas fa-trash"></i> Delete</button>
+</div>
+</div>
+</div>
+<div class="final-report">
+<h4 style="margin-bottom:10px;font-size:15px;border-bottom:1px solid #eee;padding-bottom:5px;text-align:center">Daily Summary</h4>
+<div class="report-row"><span>Total In:</span><strong class="in-clr" id="fIn">0</strong></div>
+<div class="report-row"><span>Total Out:</span><strong class="out-clr" id="fOut">0</strong></div>
+<div class="report-row" style="font-size:16px;margin-top:5px;border-top:2px solid #eee;padding-top:5px"><span>Net Balance:</span><strong class="bal-clr" id="fBal">0</strong></div>
+</div>
+</div>
+<div class="no-print" style="padding:10px">
+<button style="background:#ff1744;font-size:12px;padding:8px" onclick="resetData()">CLEAR DATA</button>
+</div>
+</div>
+
+<script>
+let allRecords = JSON.parse(localStorage.getItem("konika_records")) || {};
+const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function formatNum(num){
+  if(isNaN(num)) return "0";
+  return new Intl.NumberFormat('en-IN').format(Math.round(num));
+}
+
+function handleInput(input){
+  let value = input.value.replace(/[^0-9]/g,'');
+  if(value === ""){ input.value = ""; return; }
+  input.value = formatNum(parseFloat(value));
+}
+
+function getTodayKey(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function getDateFormatted(dateStr){
+  const date = new Date(dateStr+"T00:00:00");
+  const day = date.toLocaleDateString('en-US',{weekday:'long'}).toUpperCase();
+  const dateNum = date.getDate();
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+  return {day, dateNum, month, year};
+}
+
+function updateDashDates(){
+  const fmt = getDateFormatted(getTodayKey());
+  document.getElementById("dashDay").innerText = fmt.day;
+  document.getElementById("dashDate").innerText = fmt.dateNum + " " + fmt.month + " " + fmt.year;
+}
+
+function save(){
+  let type = document.getElementById("type").value;
+  let rawAmt = document.getElementById("amountDisplay").value.replace(/,/g,'');
+  let amt = parseFloat(rawAmt);
+  let note = document.getElementById("note").value.trim() || "Details";
+  if(!amt || amt <= 0){
+    Swal.fire({icon:'error',title:'Invalid Amount',text:'Enter valid amount!',timer:2000});
+    return;
+  }
+  if(note.length > 100){
+    Swal.fire({icon:'error',title:'Note Too Long',text:'Keep description within 100 characters!',timer:2000});
+    return;
+  }
+  let today = getTodayKey();
+  if(!allRecords[today]) allRecords[today] = [];
+  allRecords[today].push({id:Date.now(), type, amt, note});
+  localStorage.setItem("konika_records", JSON.stringify(allRecords));
+  document.getElementById("amountDisplay").value = "";
+  document.getElementById("note").value = "";
+  updateDashDates();
+  loadDash();
+  Swal.fire({title:'Saved!',icon:'success',timer:1200,showConfirmButton:false,position:'top',toast:true,background:'#e8f5e9'});
+}
+
+function loadDash(){
+  updateDashDates();
+  let today = getTodayKey();
+  let records = allRecords[today] || [];
+  let inT = 0, outT = 0;
+  records.forEach(d => { if(d.type=="in") inT+=d.amt; else outT+=d.amt; });
+  document.getElementById("inT").innerText = formatNum(inT) + " Tk";
+  document.getElementById("outT").innerText = formatNum(outT) + " Tk";
+  document.getElementById("bal").innerText = formatNum(inT-outT) + " Tk";
+}
+
+function openRecords(){
+  document.getElementById("dash").classList.remove("active");
+  document.getElementById("rec").classList.add("active");
+  document.getElementById("dateFilter").value = getTodayKey();
+  renderByDate();
+}
+
+function selectToEdit(type){
+  let selectedDate = document.getElementById("dateFilter").value;
+  let records = allRecords[selectedDate] || [];
+  let filtered = records.filter(r => r.type === type);
+  if(filtered.length === 0){
+    Swal.fire({icon:'info',title:'No Records',text:`No ${type==='in'?'Cash In':'Cash Out'} transactions found!`,timer:2000});
+    return;
+  }
+  let options = {};
+  filtered.forEach((r, idx) => { options[r.id] = `${idx+1}. ${r.note} - ${formatNum(r.amt)} Tk`; });
+  Swal.fire({
+    title:'Select Transaction to Edit', input:'select', inputOptions:options,
+    inputPlaceholder:'Choose a transaction', showCancelButton:true,
+    confirmButtonText:'Edit', cancelButtonText:'Cancel',
+    confirmButtonColor:'#00c853', cancelButtonColor:'#999',
+    inputValidator:(v)=>{ if(!v) return 'Please select a transaction!'; }
+  }).then(result => { if(result.isConfirmed) editRecord(selectedDate, parseInt(result.value)); });
+}
+
+function selectToDelete(type){
+  let selectedDate = document.getElementById("dateFilter").value;
+  let records = allRecords[selectedDate] || [];
+  let filtered = records.filter(r => r.type === type);
+  if(filtered.length === 0){
+    Swal.fire({icon:'info',title:'No Records',text:`No ${type==='in'?'Cash In':'Cash Out'} transactions found!`,timer:2000});
+    return;
+  }
+  let options = {};
+  filtered.forEach((r, idx) => { options[r.id] = `${idx+1}. ${r.note} - ${formatNum(r.amt)} Tk`; });
+  Swal.fire({
+    title:'Select Transaction to Delete', input:'select', inputOptions:options,
+    inputPlaceholder:'Choose a transaction', showCancelButton:true,
+    confirmButtonText:'Delete', cancelButtonText:'Cancel',
+    confirmButtonColor:'#ff1744', cancelButtonColor:'#999',
+    inputValidator:(v)=>{ if(!v) return 'Please select a transaction!'; }
+  }).then(result => { if(result.isConfirmed) deleteRecord(selectedDate, parseInt(result.value)); });
+}
+
+function editRecord(date, id){
+  let record = allRecords[date].find(r => r.id === id);
+  if(!record) return;
+  Swal.fire({
+    title:'Edit Transaction',
+    html:`<select id="editType" class="swal2-input" style="width:80%">
+      <option value="in" ${record.type==='in'?'selected':''}>Cash In</option>
+      <option value="out" ${record.type==='out'?'selected':''}>Cash Out</option>
+    </select>
+    <input id="editNote" class="swal2-input" placeholder="Purpose / Details" value="${record.note.replace(/"/g,'&quot;')}" maxlength="100" style="width:80%">
+    <input id="editAmount" class="swal2-input" placeholder="Amount" value="${formatNum(record.amt)}" style="width:80%">`,
+    showCancelButton:true, confirmButtonText:'Update', cancelButtonText:'Cancel',
+    confirmButtonColor:'#00c853', cancelButtonColor:'#999',
+    preConfirm:()=>{
+      const type = document.getElementById('editType').value;
+      const note = document.getElementById('editNote').value.trim();
+      const rawAmt = document.getElementById('editAmount').value.replace(/,/g,'');
+      const amt = parseFloat(rawAmt);
+      if(!note){ Swal.showValidationMessage('Please enter details'); return false; }
+      if(!amt || amt <= 0){ Swal.showValidationMessage('Please enter valid amount'); return false; }
+      if(note.length > 100){ Swal.showValidationMessage('Details too long (max 100 characters)'); return false; }
+      return {type, note, amt};
+    }
+  }).then(result => {
+    if(result.isConfirmed){
+      const {type, note, amt} = result.value;
+      let idx = allRecords[date].findIndex(r => r.id === id);
+      allRecords[date][idx] = {id, type, amt, note};
+      localStorage.setItem("konika_records", JSON.stringify(allRecords));
+      renderByDate();
+      loadDash();
+      Swal.fire({title:'Updated!',icon:'success',timer:1500,showConfirmButton:false});
+    }
+  });
+}
+
+function deleteRecord(date, id){
+  Swal.fire({
+    title:'Delete Transaction?', text:'This action cannot be undone!', icon:'warning',
+    showCancelButton:true, confirmButtonColor:'#ff1744', cancelButtonColor:'#999',
+    confirmButtonText:'Yes, Delete', cancelButtonText:'Cancel'
+  }).then(result => {
+    if(result.isConfirmed){
+      allRecords[date] = allRecords[date].filter(r => r.id !== id);
+      localStorage.setItem("konika_records", JSON.stringify(allRecords));
+      renderByDate();
+      loadDash();
+      Swal.fire({title:'Deleted!',text:'Transaction removed successfully',icon:'success',timer:1500,showConfirmButton:false});
+    }
+  });
+}
+
+function renderByDate(){
+  let selectedDate = document.getElementById("dateFilter").value;
+  if(!selectedDate) return;
+  let records = allRecords[selectedDate] || [];
+  let inBox = document.getElementById("inList");
+  let outBox = document.getElementById("outList");
+  inBox.innerHTML = "";
+  outBox.innerHTML = "";
+  let inSum = 0, outSum = 0, inCount = 1, outCount = 1;
+  if(records.length === 0){
+    inBox.innerHTML = '<div style="padding:15px;text-align:center;color:#999">No transactions</div>';
+    outBox.innerHTML = '<div style="padding:15px;text-align:center;color:#999">No transactions</div>';
+  }
+  records.forEach(r => {
+    let isIn = r.type == "in";
+    if(isIn) inSum += r.amt; else outSum += r.amt;
+    let safeNote = r.note.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    let html = `<div class="item"><div class="item-left"><span class="item-num">${isIn?inCount++:outCount++}.</span><span class="note" title="${safeNote}">${safeNote}</span></div><span class="amt ${isIn?'in-clr':'out-clr'}">${formatNum(r.amt)}</span></div>`;
+    if(isIn) inBox.innerHTML += html; else outBox.innerHTML += html;
+  });
+  document.getElementById("sumIn").innerText = formatNum(inSum) + " Tk";
+  document.getElementById("sumOut").innerText = formatNum(outSum) + " Tk";
+  document.getElementById("fIn").innerText = formatNum(inSum) + " Tk";
+  document.getElementById("fOut").innerText = formatNum(outSum) + " Tk";
+  document.getElementById("fBal").innerText = formatNum(inSum-outSum) + " Tk";
+  const fmt = getDateFormatted(selectedDate);
+  document.getElementById("recDay").innerText = fmt.day;
+  document.getElementById("recDate").innerText = fmt.dateNum + " " + fmt.month + " " + fmt.year;
+}
+
+function downloadPDF(){
+  const element = document.getElementById('printableArea');
+  const selectedDate = document.getElementById("dateFilter").value;
+  const hiddenEls = element.querySelectorAll('.no-print, .action-footer-btns, .footer-edit-btn, .footer-delete-btn');
+  hiddenEls.forEach(el => el.style.display = 'none');
+  const opt = {
+    margin:[8,8,8,8],
+    filename:`Konika_Report_${selectedDate}.pdf`,
+    image:{type:'jpeg', quality:1.0},
+    html2canvas:{
+      scale:7,
+      useCORS:true,
+      allowTaint:true,
+      backgroundColor:'#f1f5f9',
+      letterRendering:true,
+      logging:false
+    },
+    jsPDF:{unit:'mm', format:'a4', orientation:'portrait', compress:true},
+    pagebreak:{mode:['avoid-all','css','legacy']}
+  };
+  Swal.fire({
+    title:'Generating PDF...',
+    text:'High quality export, please wait...',
+    allowOutsideClick:false,
+    didOpen:()=>{ Swal.showLoading(); }
+  });
+  html2pdf().set(opt).from(element).save().then(()=>{
+    hiddenEls.forEach(el => el.style.display = '');
+    Swal.fire({title:'Downloaded!',icon:'success',timer:1500,showConfirmButton:false});
+  }).catch(err => {
+    hiddenEls.forEach(el => el.style.display = '');
+    console.error(err);
+    Swal.fire({icon:'error',title:'PDF Error',text:'Problem creating PDF'});
+  });
+}
+
+function resetData(){
+  Swal.fire({
+    title:'Clear All Data?', text:'All transactions for this day will be permanently deleted!', icon:'warning',
+    showCancelButton:true, confirmButtonColor:'#ff1744', cancelButtonColor:'#999',
+    confirmButtonText:'Yes, Clear All', cancelButtonText:'Cancel'
+  }).then(result => {
+    if(result.isConfirmed){
+      const selectedDate = document.getElementById("dateFilter").value;
+      delete allRecords[selectedDate];
+      localStorage.setItem("konika_records", JSON.stringify(allRecords));
+      renderByDate();
+      loadDash();
+      Swal.fire({title:'Cleared!',text:'All data removed successfully',icon:'success',timer:1500,showConfirmButton:false});
+    }
+  });
+}
+
+function back(){
+  document.getElementById("rec").classList.remove("active");
+  document.getElementById("dash").classList.add("active");
+  loadDash();
+}
+
+updateDashDates();
+loadDash();
+setInterval(updateDashDates, 60000);
+document.addEventListener('visibilitychange', () => { if(!document.hidden) loadDash(); });
+</script>
+</body>
+</html>
